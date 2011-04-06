@@ -35,11 +35,7 @@ module Devise
 
       # Checks if a resource is valid upon authentication.
       def valid_ldap_authentication?(password)
-        if Devise::LdapAdapter.valid_credentials?(login_with, password)
-          return true
-        else
-          return false
-        end
+        Devise::LdapAdapter.valid_credentials?(login_with, password)
       end
       
       def ldap_groups
