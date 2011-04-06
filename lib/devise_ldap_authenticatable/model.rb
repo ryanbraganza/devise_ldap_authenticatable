@@ -18,7 +18,7 @@ module Devise
       end
 
       def login_with
-        self[::Devise.authentication_keys.first]
+         read_attribute(::Devise.authentication_keys.first)
       end
       
       def reset_password!(new_password, new_password_confirmation)
