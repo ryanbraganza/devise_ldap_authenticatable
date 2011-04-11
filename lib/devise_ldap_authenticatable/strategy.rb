@@ -9,7 +9,8 @@ module Devise
       # success and the authenticated user if everything is okay. Otherwise redirect
       # to sign in page.
       def authenticate!
-        resource = valid_password? && mapping.to.authenticate_with_ldap(authentication_hash)
+        attributes = authentication_hash.dup.merge(:password => password)
+        resource = valid_password? && mapping.to.authenticate_with_ldap(attributes)
 
         if validate(resource){ true }
           success!(resource)

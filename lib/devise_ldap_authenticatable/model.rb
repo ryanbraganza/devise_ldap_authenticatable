@@ -57,7 +57,7 @@ module Devise
           resource = where(@login_with => attributes[@login_with]).first
                     
           if (resource.blank? and ::Devise.ldap_create_user)
-            resource = new
+            resource = self.new
             resource[@login_with] = attributes[@login_with]
             resource.password = attributes[:password]
           end
