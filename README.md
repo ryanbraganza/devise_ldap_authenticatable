@@ -13,6 +13,11 @@ in the devise initializer at the bottom (config/initializers/devise.rb)
 
 and any other steps the original ldap_authenticable required as explained further in this readme.
 
+Notable differences from the original:
+
+* updated to devise 1.2.1
+* removed update ldap password feature
+
 Original README
 ===============
 
