@@ -1,6 +1,20 @@
 Devise LDAP Authenticatable
 ===========================
 
+This is a fork of https://github.com/cschiewek/devise_ldap_authenticatable intended to be used
+simultaneously with database_authenticatable.
+
+to use it:
+
+* add `t.ldap_authenticatable :null => false` to your users migration
+* add `devise :database_authenticatable, :ldap_authenticatable` in your user model (ldap after db)
+* push database_authenticable on pole position in warden stack `manager.default_strategies(:scope => :user).unshift :database_authenticatable` (to be tried before ldap)
+
+and any other steps the original ldap_authenticable required as explained further in this readme.
+
+Original README
+===============
+
 Devise LDAP Authenticatable is a LDAP based authentication strategy for the [Devise](http://github.com/plataformatec/devise) authentication framework.
 
 If you are building applications for use within your organization which require authentication and you want to use LDAP, this plugin is for you.
