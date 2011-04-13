@@ -20,18 +20,6 @@ module Devise
       def login_with
          read_attribute(::Devise.authentication_keys.first)
       end
-      
-      def reset_password!(new_password, new_password_confirmation)
-        if new_password == new_password_confirmation && ::Devise.ldap_update_password
-          Devise::LdapAdapter.update_password(login_with, new_password)
-        end
-        clear_reset_password_token if valid?
-        save
-      end
-
-      def password=(new_password)
-        @password = new_password
-      end
 
       # Checks if a resource is valid upon authentication.
       def valid_ldap_authentication?(password)
@@ -70,11 +58,8 @@ module Devise
           end
         end
         
-        def update_with_password(resource)
-          puts "UPDATE_WITH_PASSWORD: #{resource.inspect}"
-        end
-        
       end
+
     end
   end
 end
