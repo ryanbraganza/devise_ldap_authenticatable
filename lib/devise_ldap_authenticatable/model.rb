@@ -48,6 +48,7 @@ module Devise
             resource = self.new
             resource[@login_with] = attributes[@login_with]
             resource.password = attributes[:password]
+            resource.is_ldap = true
           end
                     
           if resource.try(:valid_ldap_authentication?, attributes[:password])
