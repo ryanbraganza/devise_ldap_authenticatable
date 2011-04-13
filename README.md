@@ -9,6 +9,7 @@ to use it:
 * add `t.ldap_authenticatable :null => false` to your users migration
 * add `devise :database_authenticatable, :ldap_authenticatable` in your user model (ldap after db)
 * push database_authenticable on pole position in warden stack `manager.default_strategies(:scope => :user).unshift :database_authenticatable` (to be tried before ldap)
+in the devise initializer at the bottom (config/initializers/devise.rb)
 
 and any other steps the original ldap_authenticable required as explained further in this readme.
 
