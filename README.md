@@ -7,7 +7,7 @@ simultaneously with database_authenticatable.
 to use it:
 
 * add `t.ldap_authenticatable :null => false` to your users migration
-* add `devise :database_authenticatable, :ldap_authenticatable` in your user model (ldap after db)
+* add `devise :database_authenticatable, :default => nil, :ldap_authenticatable` in your user model (ldap after db), the `:default => nil` is to avoid empty duplicates error on email
 * push database_authenticable on pole position in warden stack `manager.default_strategies(:scope => :user).unshift :database_authenticatable` (to be tried before ldap)
 in the devise initializer at the bottom (config/initializers/devise.rb)
 
