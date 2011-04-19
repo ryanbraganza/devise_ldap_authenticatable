@@ -6,9 +6,9 @@ module Devise
     
     def self.valid_credentials?(login, password_plaintext)
       options = {:login => login, 
-                 :password => password_plaintext, 
-                 :ldap_auth_username_builder => ::Devise.ldap_auth_username_builder,
-                 :admin => ::Devise.ldap_use_admin_to_bind}
+        :password => password_plaintext,
+        :ldap_auth_username_builder => ::Devise.ldap_auth_username_builder,
+        :admin => ::Devise.ldap_use_admin_to_bind}
                  
       resource = LdapConnect.new(options)
       resource.authorized?
@@ -16,9 +16,9 @@ module Devise
     
     def self.update_password(login, new_password)
       options = {:login => login,
-                 :new_password => new_password,
-                 :ldap_auth_username_builder => ::Devise.ldap_auth_username_builder,
-                 :admin => ::Devise.ldap_use_admin_to_bind}
+        :new_password => new_password,
+        :ldap_auth_username_builder => ::Devise.ldap_auth_username_builder,
+        :admin => ::Devise.ldap_use_admin_to_bind}
                  
       resource = LdapConnect.new(options)
       resource.change_password! if new_password.present? 
@@ -26,8 +26,8 @@ module Devise
     
     def self.get_groups(login)
       options = {:login => login, 
-                 :ldap_auth_username_builder => ::Devise.ldap_auth_username_builder,
-                 :admin => ::Devise.ldap_use_admin_to_bind}
+        :ldap_auth_username_builder => ::Devise.ldap_auth_username_builder,
+        :admin => ::Devise.ldap_use_admin_to_bind}
 
       ldap = LdapConnect.new(options)
       ldap.user_groups
@@ -35,8 +35,8 @@ module Devise
     
     def self.get_dn(login)
       options = {:login => login, 
-                 :ldap_auth_username_builder => ::Devise.ldap_auth_username_builder,
-                 :admin => ::Devise.ldap_use_admin_to_bind}
+        :ldap_auth_username_builder => ::Devise.ldap_auth_username_builder,
+        :admin => ::Devise.ldap_use_admin_to_bind}
       resource = LdapConnect.new(options)
       resource.dn
     end
@@ -46,7 +46,7 @@ module Devise
       attr_reader :ldap, :login, :attribute
 
       def initialize(params = {})
-        ldap_config = YAML.load(ERB.new(File.read(::Devise.ldap_config || "#{Rails.root}/config/ldap.yml")).result)[Rails.env]
+        ldap_config = read_config
         ldap_options = params
         ldap_options[:encryption] = :simple_tls if ldap_config["ssl"]
 
@@ -66,6 +66,11 @@ module Devise
         @login = params[:login]
         @password = params[:password]
         @new_password = params[:new_password]
+      end
+
+      def read_config
+        config = ::Devise.ldap_config || "#{Rails.root}/config/ldap.yml"
+        YAML.load(ERB.new(File.read(config)).result)[Rails.env]
       end
 
       def dn
