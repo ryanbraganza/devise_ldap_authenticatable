@@ -46,7 +46,7 @@ module Devise
       attr_reader :ldap, :login, :attribute
 
       def initialize(params = {})
-        ldap_config = read_config
+        ldap_config = params[:config] || read_config
         ldap_options = params
         ldap_options[:encryption] = :simple_tls if ldap_config["ssl"]
 
@@ -58,7 +58,7 @@ module Devise
         @ldap_auth_username_builder = params[:ldap_auth_username_builder]
         
         @group_base = ldap_config["group_base"]
-        @required_groups = ldap_config["required_groups"]        
+        @required_groups = ldap_config["required_groups"]
         @required_attributes = ldap_config["require_attribute"]
         
         @ldap.auth ldap_config["admin_user"], ldap_config["admin_password"] if params[:admin] 
