@@ -12,12 +12,14 @@ to use it:
 in the devise initializer at the bottom (config/initializers/devise.rb)
 * override `valid_password?` in your user model to rescue invalid hash (DB auth tryes to authenticate first but when it finds an invalid password_salt BCrypt errors and we want to silence it and return false).
 
-    # ldap useers have no salt so we rescue BCrypt::Errors::InvalidHash
-    def valid_password?(password)
-      super
-    rescue BCrypt::Errors::InvalidHash => e
-      false
-    end
+```ruby
+# ldap useers have no salt so we rescue BCrypt::Errors::InvalidHash
+def valid_password?(password)
+  super
+rescue BCrypt::Errors::InvalidHash => e
+  false
+end
+```
 
 and any other steps the original ldap_authenticable required as explained further in this readme.
 
@@ -25,6 +27,8 @@ Notable differences from the original:
 
 * updated to devise 1.2.1
 * removed update ldap password feature
+
+Tested only on mri 1.9.2
 
 Original README
 ===============
