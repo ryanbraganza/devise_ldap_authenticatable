@@ -44,6 +44,8 @@ module Devise
     class LdapConnect
 
       attr_reader :ldap, :login, :attribute
+      
+      CONN_TIMEOUT = 10
 
       def initialize(params = {})
         ldap_config = params[:config] || read_config
@@ -87,7 +89,7 @@ module Devise
 
       def authenticate!
         @ldap.auth(dn, @password)
-        @ldap.bind
+        bind(@ldap)
       end
 
       def authenticated?
@@ -156,10 +158,21 @@ module Devise
       
       private
       
+      def bind(ldap)
+        begin
+          Timeout::timeout(CONN_TIMEOUT) do |sec|
+            result = ldap.bind
+          end
+        rescue Errno::ETIMEDOUT, Timeout::Error
+          result = false
+        end
+        return result
+      end
+      
       def self.admin
         ldap = LdapConnect.new(:admin => true).ldap
         
-        unless ldap.bind
+        unless bind(ldap)
           DeviseLdapAuthenticatable::Logger.send("Cannot bind to admin LDAP user")
           raise DeviseLdapAuthenticatable::LdapException, "Cannot connect to admin LDAP user"
         end
