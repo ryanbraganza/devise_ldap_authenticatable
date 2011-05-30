@@ -77,15 +77,19 @@ module Devise
       end
 
       def dn
-        DeviseLdapAuthenticatable::Logger.send("LDAP search: #{@attribute}=#{@login}")
-        filter = Net::LDAP::Filter.eq(@attribute.to_s, @login.to_s)
-        ldap_entry = nil
-        @ldap.search(:filter => filter) {|entry| ldap_entry = entry}
+        Timeout::timeout(CONN_TIMEOUT) do |sec|
+          DeviseLdapAuthenticatable::Logger.send("LDAP search: #{@attribute}=#{@login}")
+          filter = Net::LDAP::Filter.eq(@attribute.to_s, @login.to_s)
+          ldap_entry = nil
+          @ldap.search(:filter => filter) {|entry| ldap_entry = entry}
+        end
         if ldap_entry.nil?
           @ldap_auth_username_builder.call(@attribute,@login,@ldap)
         else
           ldap_entry.dn
         end
+      rescue Errno::ETIMEDOUT, Timeout::Error
+        @ldap_auth_username_builder.call(@attribute,@login,@ldap)
       end
 
       def authenticate!
@@ -98,7 +102,7 @@ module Devise
       end
       
       def authorized?
-        DeviseLdapAuthenticatable::Logger.send("Authorizing user #{dn}")
+        DeviseLdapAuthenticatable::Logger.send("Authorizing user #{@attribute}=#{@login}")
         authenticated? && in_required_groups? && has_required_attribute?
       end
       
