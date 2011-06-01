@@ -84,12 +84,12 @@ module Devise
           @ldap.search(:filter => filter) {|entry| ldap_entry = entry}
         end
         if ldap_entry.nil?
-          @ldap_auth_username_builder.call(@attribute,@login,@ldap)
+          @ldap_auth_username_builder.call(@attribute, @login, @ldap)
         else
           ldap_entry.dn
         end
-      rescue Errno::ETIMEDOUT, Timeout::Error
-        @ldap_auth_username_builder.call(@attribute,@login,@ldap)
+      rescue Errno::ETIMEDOUT, Timeout::Error, Net::LDAP::LdapError
+        @ldap_auth_username_builder.call(@attribute, @login, @ldap)
       end
 
       def authenticate!
@@ -168,7 +168,7 @@ module Devise
           Timeout::timeout(CONN_TIMEOUT) do |sec|
             result = ldap.bind
           end
-        rescue Errno::ETIMEDOUT, Timeout::Error
+        rescue Errno::ETIMEDOUT, Timeout::Error, Net::LDAP::LdapError
           result = false
         end
         return result
