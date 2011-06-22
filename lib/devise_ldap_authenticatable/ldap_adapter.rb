@@ -77,12 +77,13 @@ module Devise
       end
 
       def dn
-        Timeout::timeout(CONN_TIMEOUT) do |sec|
+        ldap_entry = nil
+        Timeout::timeout(CONN_TIMEOUT) do
           DeviseLdapAuthenticatable::Logger.send("LDAP search: #{@attribute}=#{@login}")
           filter = Net::LDAP::Filter.eq(@attribute.to_s, @login.to_s)
-          ldap_entry = nil
           @ldap.search(:filter => filter) {|entry| ldap_entry = entry}
         end
+        
         if ldap_entry.nil?
           @ldap_auth_username_builder.call(@attribute, @login, @ldap)
         else
@@ -164,14 +165,11 @@ module Devise
       private
       
       def bind(ldap)
-        begin
-          Timeout::timeout(CONN_TIMEOUT) do |sec|
-            result = ldap.bind
-          end
-        rescue Errno::ETIMEDOUT, Timeout::Error, Net::LDAP::LdapError
-          result = false
+        Timeout::timeout(CONN_TIMEOUT) do
+          ldap.bind
         end
-        return result
+      rescue Errno::ETIMEDOUT, Timeout::Error, Net::LDAP::LdapError
+        false
       end
       
       def self.admin
