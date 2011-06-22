@@ -1,5 +1,11 @@
 require "net/ldap"
-require 'timeout'
+begin
+  require 'system_timer'
+  DeviseLdapTimer = SystemTimer
+rescue LoadError
+  require 'timeout'
+  DeviseLdapTimer = Timeout
+end
 
 module Devise
 
@@ -78,7 +84,7 @@ module Devise
 
       def dn
         ldap_entry = nil
-        Timeout::timeout(CONN_TIMEOUT) do
+        DeviseLdapTimer.timeout(CONN_TIMEOUT) do
           DeviseLdapAuthenticatable::Logger.send("LDAP search: #{@attribute}=#{@login}")
           filter = Net::LDAP::Filter.eq(@attribute.to_s, @login.to_s)
           @ldap.search(:filter => filter) {|entry| ldap_entry = entry}
@@ -165,7 +171,7 @@ module Devise
       private
       
       def bind(ldap)
-        Timeout::timeout(CONN_TIMEOUT) do
+        DeviseLdapTimer.timeout(CONN_TIMEOUT) do
           ldap.bind
         end
       rescue Errno::ETIMEDOUT, Timeout::Error, Net::LDAP::LdapError
